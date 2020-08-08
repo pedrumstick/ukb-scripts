@@ -59,6 +59,9 @@ for (input_file in list.files(pattern=paste0("UKB_MERGED_PHENO_.*_",old_date,"_F
 
     if (!dir.exists("temp_updatedPhenotypes/")) {dir.create("temp_updatedPhenotypes/")}
 
+##############################
+# OUTPUT
+##############################
     fwrite(new_df, paste0("temp_updatedPhenotypes/",output_file,".txt.gz"), sep="\t", quote=FALSE, na="NA")
     print(Sys.time()-start_time)
     start_time <- Sys.time() # reset timer for next subset
