@@ -48,24 +48,23 @@ for (input_file in list.files(pattern=paste0("UKB_MERGED_PHENO_.*_",old_date,"_F
     output_df <- merge(original_df, merged_df, by="eid", all.x=TRUE)
     if (nrow(output_df)!=nrow(original_df)) {stop("ERROR: New dataframe doesn't have the same number of rows as the original dataframe! There may be duplicate IDs, troubleshooting is needed...")}
 
-    exclude_rows <- which(temp$eid %in% exclude_df[[1]])
+    exclude_rows <- which(output_df$eid %in% exclude_df[[1]])
     if (length(exclude_rows)>0) {
-        temp <- temp[-exclude_rows, ] # completely excludes individuals that withdrew consent; this may results in incompatibility for downstream analyses
+        output_df <- output_df[-exclude_rows, ] # completely excludes individuals that withdrew consent; this may results in incompatibility for downstream analyses
     }
 
-    old_columns <- grep(".x$", colnames(temp))
+    old_columns <- grep(".x$", colnames(output_df))
     if (length(old_columns)>0) {
         warning("There were ", length(old_columns), " old columns overwritten with new data.")
-        new_df <- temp[,-old_columns] # new_df[, grep(".x$", colnames(new_df)):=NULL]
-        names(new_df) <- sub("\\.y","", names(new_df))
+        output_df[, grep(".x$", colnames(output_df)):=NULL]
+        names(output_df) <- sub("\\.y","", names(output_df))
     } else {
         message("There were 0 old columns overwritten with new data.")
-        new_df <- temp
     }
 
     if (!dir.exists("temp_updatedPhenotypes/")) {dir.create("temp_updatedPhenotypes/")}
 
-    fwrite(new_df, paste0("temp_updatedPhenotypes/",output_file,".txt.gz"), sep="\t", quote=FALSE, na="NA")
+    fwrite(output_df, paste0("temp_updatedPhenotypes/",output_file,".txt.gz"), sep="\t", quote=FALSE, na="NA")
     print(Sys.time()-start_time)
     start_time <- Sys.time() # reset timer for next subset
 
