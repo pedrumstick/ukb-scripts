@@ -13,6 +13,7 @@ if (!file.exists(input_file_dates)) {stop(paste0("ERROR: There is no specified i
 ##############################
 require(reshape2)
 require(data.table)
+require(lubridate)
 
 ##############################
 # LOAD DATA FRAMES AND CONVERT TO "WIDE" FORMAT
@@ -20,12 +21,14 @@ require(data.table)
 # Primary Causes of Death
 df<-fread(input_file, header=TRUE)
 primary_df<-df[level==1, ] # extract only primary causes of death
-primary_df[order(primary_df$eid), ]
+primary_df <- primary_df[order(primary_df$eid), ]
 primary_df <- dcast(primary_df, eid ~ ins_index, value.var="cause_icd10")
 names(primary_df)[2:ncol(primary_df)] <- paste0("40001-",as.numeric(names(primary_df)[2:ncol(primary_df)]),".0")
 
 # Dates of Death
 df2<-fread(input_file_dates, header=TRUE)
+df2[, date_of_death:=dmy(date_of_death)]
+df2[, date_of_death:=as.character(date_of_death)]
 df_dates <- dcast(df2, eid ~ ins_index, value.var="date_of_death")
 names(df_dates)[2:ncol(df_dates)] <- paste0("40000-",as.numeric(names(df_dates)[2:ncol(df_dates)]),".0")
 
